@@ -1,0 +1,11 @@
+torch
+torchvision
+matplotlib
+scikit-learn
+jupyter
+pandas
+pillow
+opencv-python
+jupyterlab
+tables
+positional-encodings
