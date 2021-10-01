@@ -8,42 +8,73 @@ For questions please contact faisal.qureshi@ontariotechu.ca
 
 Contains docker files needed to set up your system to run the lesson notebooks.
 
-## Lesson 1
+~~~
+$ cd setup
+~~~
+
+Create the container.  This will create/attach container "charlie_1".  Check out `docker-compose.yml` file for more information.
+
+~~~
+$ ./container-run.sh 
+WARNING: Found orphan containers (setup_rr_1) for this project. If you removed or renamed this service in your compos
+e file, you can run this command with the --remove-orphans flag to clean it up.
+Starting charlie_1 ... done
+Attaching to charlie_1
+groups: cannot find name for group ID 1000
+~~~
+
+Now start the jupyter notebook server.  This will be bound to `localhost:8888`
+
+~~~
+$ ./container-jupyer.sh
+~~~
+
+Next, access the jupyter notebook from your desktop using SSH tunneling.  This assumes that the notebook is running on panther and that you have set up the .ssh config file appropriately.  The following maps localhost:8888 to remote host 11945 port.  You'll notice that within `docker-compose.yml` file port 8888 of container is mapped to port 11945 of host (which acts as remote below).
+
+~~~
+$ ssh panther -NL 8888:localhost:11945
+~~~
+
+We can now access the jupyter lab by going to `http://localhost:8888`.
+
+## Lesson contents
+
+### Lesson 1
 
 - PyTorch basics
 - Tensor visualization
 - Solving system of linear equations
 
-## Lesson 2
+### Lesson 2
 
 - Line fitting
 - Linear regression
 - Classification via logisitic regression
 
-## Lesson 3
+### Lesson 3
 
 - Regression and classification with neural networks with 1 hidden layer
 
-## Lesson 4
+### Lesson 4
 
 - Splitting datasets
 
-## Lesson 5
+### Lesson 5
 
 - Mixture of Gaussians
 - Vectorized computation using Einstein sum notation
 
-## Lesson 6
+### Lesson 6
 
 - CIFAR10 classification using AlexNet
 
-## Lesson 7
+### Lesson 7
 
 - Autoencoder
 - Convolutional autoencoder
 - Variational autoencoder
 
-## Lesson 8
+### Lesson 8
 
 - Work in progress (stay tuned)
 
