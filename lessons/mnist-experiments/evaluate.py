@@ -1,5 +1,6 @@
 import torch
 from torch.utils import tensorboard
+import stats
 
 class Evaluate:
     def __init__(self, device=-1):
@@ -67,7 +68,43 @@ class Evaluate:
         end.record()
         torch.cuda.synchronize()
         time_per_sample = start.elapsed_time(end)
-
         print(f'Took {time_per_sample} ms')
 
         return self.cpu(output.squeeze(0)), sample_loss.item(), time_per_sample
+
+    def evaluate(self, dataloader):
+        """
+        Evalutes loss mean and variance.  These values are computed per batch, so
+        to compute loss mean and variance per data sample, set batch_size to 1
+        in the dataloader.  
+        """
+        assert(self.model)
+        assert(self.loss)
+
+        self.model.eval()
+
+        start = torch.cuda.Event(enable_timing=True)    
+        end = torch.cuda.Event(enable_timing=True)
+        loss_stats = stats.RunningMeanAndVar()
+
+        start.record()
+        for data in dataloader:
+            imgs = self.gpu(data['sample'])
+            with torch.no_grad():
+                output = self.model(imgs)
+            loss_stats.add(self.loss(imgs, output).item())
+        end.record()
+        torch.cuda.synchronize()
+        time_elapsed = start.elapsed_time(end) # in ms
+
+        losses = loss_stats.values()
+        print(f'Loss: mean={losses["mean"]}, average={losses["var"]}')
+        print(f'Took {time_elapsed} ms')
+
+        return losses['mean'], losses['var'], time_elapsed
+
+if __name__ == '__main__':
+    x = statistics.RunningMeanAndVar()
+    x.add(1)
+    x.add(3)
+    print(x.values())

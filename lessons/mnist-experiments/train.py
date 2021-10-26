@@ -196,7 +196,8 @@ class Training:
         print('Average time per epoch (ms):')
         print(f'\ttrain={self.ave_time_per_epoch["train"]:16.4}, validation={self.ave_time_per_epoch["validation"]:16.4}')
 
+        self.current_epoch = epoch   # Next time training starts at self.current_epoch+1
+
         if last_checkpt_epoch != epoch:
             self.save_checkpoint(epoch)       # Save at the end of this training run
 
-        self.current_epoch = epoch   # Next time training starts at self.current_epoch+1
