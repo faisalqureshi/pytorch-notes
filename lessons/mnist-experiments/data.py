@@ -1,10 +1,11 @@
 import math
+import os
 import numpy as np
 import torch
 import torchvision as tv
 
 class Digits(torch.utils.data.Dataset):
-    def __init__(self, mnist_digits, digits = 'all'):
+    def __init__(self, datafolder, digits):
         """
         A little wrapper around MNIST dataset.
         
@@ -14,15 +15,21 @@ class Digits(torch.utils.data.Dataset):
             when used with dataloaders, returns items of the form {'sample': 1x28x28, 'label': digit}
         """
         
-        
         try:
-            self.samples = torch.load('mnist_samples.pt')
-            self.labels = torch.load('mnist_labels.pt')
+            self.samples = torch.load(os.path.join(datafolder, 'mnist_samples.pt'))
+            self.labels = torch.load(os.path.join(datafolder, 'mnist_labels.pt'))
         
             if not self.samples.shape == (60000, 1, 28, 28) or not self.labels.shape == (60000, 1):
                 raise
         except:
-            mnist_digits = mnist_digits
+            # We didn't find precompiled data
+            my_transforms = tv.transforms.Compose([
+                tv.transforms.ToTensor(),
+                tv.transforms.ConvertImageDtype(torch.float),
+                tv.transforms.Normalize((0.5,), (0.5,))
+            ])
+
+            mnist_digits = tv.datasets.MNIST(datafolder, transform=my_transforms, download=True)
             n = len(mnist_digits)
             assert(n == 60000)
             
@@ -33,8 +40,11 @@ class Digits(torch.utils.data.Dataset):
                 self.samples[i,...] = mnist_digits[i][0]
                 self.labels[i,] = mnist_digits[i][1]
             
-            torch.save(self.samples, 'mnist_samples.pt')
-            torch.save(self.labels, 'mnist_labels.pt')
+            try:
+                torch.save(self.samples, os.path.join(datafolder, 'mnist_samples.pt'))
+                torch.save(self.labels, os.path.join(datafolder, 'mnist_labels.pt'))
+            except:
+                print(f'Error saving compiled data to {datafolder}')
         
         if digits == 'all':
             self.n = self.samples.shape[0]
@@ -51,20 +61,11 @@ class Digits(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         return {'sample': self.samples[idx], 'label': self.labels[idx]}
 
-def set_mnist_data(digits= 'all', folder='../../datasets'):
+def set_mnist_data(datafolder='./datasets', digits= 'all'):
     """
     digits: 'all' or a list of digits [1, 2, 3, ...] when interested in a subset of MNIST data
     """
-    
-    my_transforms = tv.transforms.Compose([
-        tv.transforms.ToTensor(),
-        tv.transforms.ConvertImageDtype(torch.float),
-        tv.transforms.Normalize((0.5,), (0.5,))
-    ])
-
-    mnist_digits = tv.datasets.MNIST('../../datasets', transform=my_transforms, download=True)
-
-    return Digits(mnist_digits, digits)
+    return Digits(datafolder, digits)
 
 def view(dataset, index=-1):
     if index < 0 or index >= len(dataset):

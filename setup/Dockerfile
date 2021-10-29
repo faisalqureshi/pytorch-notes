@@ -13,7 +13,8 @@ RUN apt-get install -y build-essential \
 RUN mkdir -p /tmp
 COPY requirements.txt /tmp/
 RUN pip3 -q install pip --upgrade
-RUN pip3 install -r /tmp/requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip3 install -r /tmp/requirements.txt
+# -f https://download.pytorch.org/whl/torch_stable.html
 
 RUN groupadd -g 1010 dockeruser
 RUN useradd -r -m -g 1010 dockeruser 

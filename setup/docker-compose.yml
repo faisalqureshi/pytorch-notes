@@ -3,7 +3,7 @@ services:
     charlie:
       container_name: charlie_1
       build: .
-      image: qureshi/ml:1.3
+      image: qureshi/ml:1.4
       user: $user_id:$group_id
       working_dir: /home/dockeruser
       stdin_open: true
@@ -12,12 +12,19 @@ services:
       tty: true
       ports: 
         - "11945:8888"
+        - "11946:8008"
       group_add:
         - "1010"
+        - "video"
       environment:
         - HOME="/home/dockeruser"
       deploy:
         resources:
           reservations:
             devices:
-              - capabilities: [gpu]
+              - driver: nvidia
+                capabilities: 
+                  - gpu
+                  - utility
+                  - compute
+                  - video

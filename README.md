@@ -12,7 +12,14 @@ Contains docker files needed to set up your system to run the lesson notebooks.
 $ cd setup
 ~~~
 
-Create the container.  This will create/attach container "charlie_1".  Check out `docker-compose.yml` file for more information.
+If you have made any changes to the Dockerfile or requirements.txt files, or if you want to build the image for the very first time
+
+~~~
+$ docker-compose build
+~~~
+
+Now that the image is ready, we will create a container and attach it to the image.
+The following will create/attach container "charlie_1".  Check out `docker-compose.yml` file for more information.
 
 ~~~
 $ ./container-run.sh 

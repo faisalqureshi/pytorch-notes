@@ -46,8 +46,14 @@ class Evaluate:
     def load_checkpoint(self, filepath):
         assert(self.model)
 
-        checkpoint = torch.load(filepath)
-        self.model.load_state_dict(checkpoint['model_state_dict'])
+        try:
+            checkpoint = torch.load(filepath)
+            self.model.load_state_dict(checkpoint['model_state_dict'])
+            print(f'Checkpoint loaded: {filepath}')
+            return True
+        except:
+            print(f'Cannot load model checkpoint: {filepath}')
+        return False
 
     def reconstruct_one_image(self, img):
         assert(self.model)
